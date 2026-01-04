@@ -1,48 +1,47 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import NebulaScene from '@/components/NebulaScene';
+import PlayerHUD from '@/components/PlayerHUD';
+
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Hydration fix: Ensure Three.js only loads on the client side
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
+        <div className="text-white font-mono animate-pulse">LOADING STREAM...</div>
+      </div>
+    );
+  }
+
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center pt-10 px-4">
-      
-      {/* Header Section */}
-      <header className="text-center mb-8">
-        <h1 className="text-5xl font-black tracking-tighter uppercase italic">
-          SMOKE STREAM
-        </h1>
-        <div className="h-1 w-24 bg-purple-600 mx-auto mt-2"></div>
-      </header>
+    <main className="relative h-screen w-full overflow-hidden bg-black">
+      {/* 3D Visualizer Layer (Background) */}
+      <NebulaScene />
 
-      {/* Main Stream Container */}
-      <section className="w-full max-w-4xl bg-zinc-900 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(168,85,247,0.2)] border border-zinc-800">
-        
-        {/* The Live Video Feed */}
-        <div className="aspect-video bg-black flex items-center justify-center">
-           <img 
-            src="http://localhost:5000/video_feed" 
-            alt="Live Stream" 
-            className="w-full h-full object-cover"
-          />
+      {/* UI Overlay Layer (Foreground) */}
+      <div className="relative z-10 pointer-events-none">
+        <div className="p-8">
+          <h1 className="text-4xl font-black text-white tracking-tighter italic">
+            SMOKE STREAM <span className="text-purple-500">v2.0</span>
+          </h1>
+          <p className="text-white/40 text-sm font-mono mt-2">
+            GENERATIVE AUDIO EXPERIENCE // POWERED BY SUNO AI
+          </p>
         </div>
+      </div>
 
-        {/* Info Bar under Video */}
-        <div className="p-6 flex justify-between items-center bg-zinc-900">
-          <div>
-            <h2 className="text-2xl font-bold text-purple-400">Neon Dreams</h2>
-            <p className="text-zinc-400 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              DJ Smoke Stream • Live
-            </p>
-          </div>
-          
-          <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full transition-all">
-            SHARE
-          </button>
-        </div>
-      </section>
-
-      {/* Quick Stats/Controls */}
-      <footer className="mt-8 text-zinc-500 text-sm italic">
-        Powered by Stream1 Engine v1.0
-      </footer>
+      {/* Interactive Controls */}
+      <PlayerHUD />
       
+      {/* Decorative Gradient Overlay for depth */}
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-black/40 via-transparent to-black/60" />
     </main>
   );
 }
