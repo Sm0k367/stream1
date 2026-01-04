@@ -1,10 +1,10 @@
 import cv2
-from flask import Flask, render_template, Response
+from flask import Flask, Response
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app) # This allows Next.js to talk to Flask without security blocks
 
-# Initialize the camera. '0' is usually the default webcam.
-# For an IP camera, replace 0 with 'rtsp://username:password@IP_ADDRESS:554/path'
 camera = cv2.VideoCapture(0)
 
 def generate_frames():
@@ -13,20 +13,17 @@ def generate_frames():
         if not success:
             break
         else:
-            # Encode the frame in JPEG format
+            # Lower the resolution slightly for smoother web streaming
+            frame = cv2.resize(frame, (640, 480))
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
 
-            # Yield the output frame in the byte format required for streaming
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route('/video_feed')
 def video_feed():
+    # This is the URL Next.js will use: http://localhost:5000/video_feed
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
