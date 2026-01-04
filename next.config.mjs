@@ -1,69 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  compress: true,
-  poweredByHeader: false,
-  productionBrowserSourceMaps: false,
-  optimizeFonts: true,
+  // 1. Enable static export for GitHub Pages
+  output: 'export',
+  
+  // 2. Set the base path to match your repository name
+  // This ensures your assets load from /stream1/ instead of /
+  basePath: '/stream1',
+  assetPrefix: '/stream1',
+
+  // 3. Disable image optimization (required for static export)
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn1.suno.ai',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'grainy-gradients.vercel.app',
-        pathname: '/**',
-      },
-    ],
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    unoptimized: true,
   },
-  webpack: (config, { isServer }) => {
-    config.optimization.minimize = true;
-    return config;
-  },
-  experimental: {
-    optimizePackageImports: ['framer-motion', 'zustand', 'three'],
-  },
-  headers: async () => {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-        ],
-      },
-    ];
-  },
+
+  // 4. Handle Three.js and Transpilation
+  transpilePackages: ['three'],
 };
 
 export default nextConfig;
